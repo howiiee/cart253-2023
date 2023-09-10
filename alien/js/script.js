@@ -20,8 +20,8 @@ function preload() {
  * Description of setup
 */
 function setup() {
-    cretaeCanvas(400,400);
-    backgroud(0, 0, 0);
+    createCanvas(400,400);
+    background(0, 0, 0);
 }
 
 
