@@ -2,7 +2,6 @@
 let circles = [];
 let attempts = 500;
 
-// preload() function is empty, but it could be used to load external files (like images, sounds) before the sketch starts.
 function preload() { }
 
 function setup() {
