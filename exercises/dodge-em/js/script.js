@@ -1,32 +1,23 @@
-/**
- * Title of Project
- * Author Name
- * 
- * This is a template. You must fill in the title, author, 
- * and this description to match your project!
- */
 
-"use strict";
+let bgGif;
+let sun;
 
-/**
- * Description of preload
-*/
 function preload() {
 
+bgGif = loadImage("assets/images/space.gif");
+sun = loadImage("assets/images/sun.gif")
+
 }
 
-
-/**
- * Description of setup
-*/
 function setup() {
-
+    createCanvas(500, 500);
+    imageMode(CENTER);
 }
 
 
-/**
- * Description of draw()
-*/
 function draw() {
+
+    image(bgGif, 250, 250, width, height);
+    image(sun, 250, 250, 200, 200);
 
 }
