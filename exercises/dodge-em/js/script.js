@@ -1,10 +1,21 @@
 
 let bgGif;
-let sun;
+let fire;
+
+let sun = {
+    x: 250,
+    y: 250,
+    img: undefined,
+    width: 200,
+    height: 200
+
+}
 
 let uranus = {
     x: 250,
     y:95,
+    initialX: 250,
+    initialY:95,
     img: undefined,
     width: 75,
     height: 75,
@@ -14,6 +25,8 @@ let uranus = {
 let planet = {
     x: 375,
     y:125,
+    initialX: 375,
+    initialY:125,
     img: undefined,
     width: 75,
     height: 75,
@@ -23,6 +36,8 @@ let planet = {
 let planet2 = {
     x: 405,
     y:250,
+    initialX: 405,
+    initialY:250,
     img: undefined,
     width: 75,
     height: 75,
@@ -32,6 +47,8 @@ let planet2 = {
 let mars = {
     x: 375,
     y:375,
+    initialX: 375,
+    initialY:375,
     img: undefined,
     width: 75,
     height: 75,
@@ -41,6 +58,8 @@ let mars = {
 let moon = {
     x: 125,
     y: 375,
+    initialX: 125,
+    initialY: 375,
     img: undefined,
     width: 75,
     height: 75,
@@ -50,6 +69,8 @@ let moon = {
 let saturn = {
     x: 125,
     y:125,
+    initialX: 125,
+    initialY:125,
     img: undefined,
     width: 120,
     height: 75,
@@ -59,6 +80,8 @@ let saturn = {
 let alien = {
     x: 95,
     y:250,
+    initialX: 95,
+    initialY:250,
     img: undefined,
     width: 75,
     height: 75,
@@ -68,6 +91,8 @@ let alien = {
 let earth = {
     x: 250,
     y:405,
+    initialX: 250,
+    initialY:405,
     img: undefined,
     width: 75,
     height: 75,
@@ -79,7 +104,7 @@ let planets = [uranus, saturn, alien, planet, planet2, moon, mars, earth];
 function preload() {
 
 bgGif = loadImage("assets/images/space.gif");
-sun = loadImage("assets/images/sun.gif");
+sun.img = loadImage("assets/images/sun.gif");
 earth.img = loadImage("assets/images/earth.gif");
 uranus.img = loadImage("assets/images/uranus.png");
 planet.img = loadImage("assets/images/planet.png");
@@ -88,6 +113,7 @@ mars.img = loadImage("assets/images/mars.png");
 saturn.img = loadImage("assets/images/saturn.png");
 alien.img = loadImage("assets/images/alien.png");
 moon.img = loadImage("assets/images/moon.png");
+fire = loadImage("assets/images/fire.gif");
 
 }
 
@@ -98,20 +124,24 @@ function setup() {
 
 
 function draw() {
-
     image(bgGif, 250, 250, width, height);
-    image(sun, 250, 250, 200, 200);
+    image(sun.img, sun.x, sun.y, sun.width, sun.height);
 
-    for (let i = 0; i < planets.length; i++){
-        if (planets[i].dragging){
-            image(planets[i].img, mouseX, mouseY, planets[i].width, planets[i].height);
+    for (let i = 0; i < planets.length; i++) {
+        if (planets[i].dragging) {
+            planets[i].x = mouseX;
+            planets[i].y = mouseY;
         }
-        else{
+        
+        let d = dist(sun.x, sun.y, planets[i].x, planets[i].y);
+        if (d < sun.width / 2 + planets[i].width / 2) {
+            image(fire, planets[i].x, planets[i].y, planets[i].width, planets[i].height);
+        } else {
             image(planets[i].img, planets[i].x, planets[i].y, planets[i].width, planets[i].height);
         }
     }
-
 }
+
 
 function mousePressed(){
 
@@ -124,10 +154,12 @@ function mousePressed(){
 
 }
 
-function mouseReleased(){
-    
-    for (let i = 0; i < planets.length; i++){
+function mouseReleased() {
+    for (let i = 0; i < planets.length; i++) {
+        if(planets[i].dragging) {
+            planets[i].x = planets[i].initialX;
+            planets[i].y = planets[i].initialY;
+        }
         planets[i].dragging = false;
     }
-
 }
