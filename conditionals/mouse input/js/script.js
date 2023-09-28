@@ -26,5 +26,4 @@ function mouseMoved(){
     bg.r = random(0, 255);
     bg.g = random(0, 255);
     bg.b = random(0, 255);
-
 }
