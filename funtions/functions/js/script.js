@@ -14,24 +14,40 @@ function setup() {
 function draw() {
     background(0);
 
-    circle.x = circle.x + circle.vx;
-    circle.y = circle.y + circle.vy;
+    move();
+    wrap();
+    display();
 
-    if (circle.x > width){
-        circle.x = 0;
-        circle.vx += 2;
-        circle.size += 5;
-
-    }
-
-    fill(255, 0, 0);
-    ellipse (circle.x, circle.y, circle.size);
 }
 
-function mousePressed(){
+function reset(){
     circle.x =0;
     circle.vx += 2;
     circle.size += 5;
+    circle.vy += -0.25;
+}
+
+
+function mousePressed(){
+    reset();
+}
+
+function move(){
+    circle.x = circle.x + circle.vx;
+    circle.y = circle.y + circle.vy;
+}
+
+function wrap(){
+    if (circle.x > width){
+        reset();
+
+    }
+}
+
+function display(){
+    fill(255, 0, 0);
+    rectMode(CENTER);
+    rect(circle.x, circle.y, circle.size);
 }
 
 
