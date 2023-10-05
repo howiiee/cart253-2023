@@ -1,7 +1,9 @@
 
+// Initial game state and score setup
 let state = 0; // possible states are: 0, 1, 2, 3, 4 and 5
 let score = 0;
 
+// Definitions for various game objects with their positions, sizes and image placeholders
 let sun = {
     x: 100,
     y: 100,
@@ -50,17 +52,19 @@ let whiteFlowers = {
 };
 
 let mouseImg ={
-    width: undefined,
+    width: undefined, // Will represent the image under the mouse cursor
     height: undefined,
     img: undefined
 };
 
 let bgImg;
-let objects = [grass, bush, whiteFlowers, flowers, sun, cloud];
+let objects = [grass, bush, whiteFlowers, flowers, sun, cloud]; // Array to store all objects
 
 function preload() {
 
     bgImg = loadImage("assets/images/xp.jpg");
+
+    // Load image assets for various game objects
     grass.img = loadImage("assets/images/grass.gif");
     sun.img = loadImage("assets/images/sun.gif");
     bush.img = loadImage("assets/images/bush.gif");
@@ -76,6 +80,8 @@ function setup() {
 
     createCanvas(640, 400);
     imageMode(CENTER);
+
+    // Set interval to update object positions and image for mouse cursor every 2 seconds
     setInterval(updatePosition, 2000);
     setInterval(updateImg, 2000);
     
@@ -84,11 +90,9 @@ function setup() {
 
 function draw() {
 
-    console.log(score);
-
-    
-
+    // Conditional rendering based on game state
     if (state === 0){
+        // Display game instructions
         textAlign(CENTER, CENTER);
         textSize(20);
         background(166, 219, 245);
@@ -96,16 +100,14 @@ function draw() {
         text("match the mouse icon to the icons displayed on the screen <3", width/2, height/2);
     }
     else if (state === 1){
-
-        
-
-
+        // Main gameplay display and logic
         image(bgImg, width/2, height/2, width, height);
 
         textSize(20);
         textAlign(LEFT, TOP);
         fill(166, 219, 245);
         text(`score: ${score}`, 4, 0);
+
 
         image(grass.img, grass.x, grass.y, grass.width, grass.height);
         image(bush.img, bush.x, bush.y, bush.width, bush.height);
@@ -138,6 +140,7 @@ function draw() {
         }
     }
     else if (state === 2){
+        // Display feedback when a match is found
         textAlign(CENTER, CENTER);
         textSize(20);
         background(166, 219, 245);
@@ -145,6 +148,7 @@ function draw() {
         text("MATCH!", width/2, height/2);
     }
     else if (state === 3){
+        // Display message for reaching score of 5
         textAlign(CENTER, CENTER);
         textSize(20);
         background(255, 0, 0);
@@ -152,6 +156,7 @@ function draw() {
         text("tired of playing? sucks... keep playing.", width/2, height/2);
     }
     else if (state === 4){
+        // Display message for reaching score of 15
         textAlign(CENTER, CENTER);
         textSize(20);
         background(199, 0, 0);
@@ -159,6 +164,7 @@ function draw() {
         text("I SAID, keep playing.", width/2, height/2);
     }
     else if (state === 5){
+        // Display win message and offer to replay
         textAlign(CENTER, CENTER);
         textSize(20);
         background(166, 219, 245);
@@ -175,6 +181,8 @@ function draw() {
 
 
 function updatePosition() {
+
+    // Ensure objects do not overlap when repositioned
     for (let i = 0; i < objects.length; i++) {
         let overlap;
         let attempt = 0; 
@@ -200,11 +208,13 @@ function updatePosition() {
     }
 }
 
+// Check if two objects overlap
 function isOverlapping(obj1, obj2) {
     let distance = dist(obj1.x, obj1.y, obj2.x, obj2.y);
     return distance < (obj1.width / 2 + obj2.width / 2);
 }
 
+// Update the image and size of the mouse cursor to a random game object
 function updateImg(){
     let randomImg = floor(random(0, objects.length));
     mouseImg.img = objects[randomImg].img;
@@ -212,6 +222,7 @@ function updateImg(){
     mouseImg.height = objects[randomImg].height;
 }
 
+// Handle mouse presses to change game states
 function mousePressed(){
     if (state === 0){
         state = 1;
