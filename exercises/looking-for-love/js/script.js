@@ -49,6 +49,7 @@ let whiteFlowers = {
     img: undefined,
     width: 43,
     height: 45
+    
 };
 
 let mouseImg ={
