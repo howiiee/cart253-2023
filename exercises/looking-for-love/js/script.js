@@ -129,7 +129,7 @@ function draw() {
                 else if(score === 15){
                     state = 4;
                 }
-                else if(score === 30){
+                else if(score === 25){
                     state = 5;
                 }
                 else{
