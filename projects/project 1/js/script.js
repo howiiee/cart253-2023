@@ -66,16 +66,28 @@ class Firefly {
         if (this.position.x < 0) this.position.x = width;
         if (this.position.y > height) this.position.y = 0;
         if (this.position.y < 0) this.position.y = height;
+
+        // Tone settings
+        if (this.phase > TWO_PI) {
+            this.phase -= TWO_PI;
+            if (this.brightness != 255) { // To prevent replaying the sound in consecutive frames
+                tone.play();
+            }
+            this.brightness = 255;  // Set max brightness
         }
+        }
+
+        
   }
 
 let fireflies = [];
 let numFireflies = 100;
 let couplingStrength = 0.1;
+let tone;
 
 
 function preload() {
-
+    // tone = loadSound('path_to_your_tone.mp3'); // Replace with the path to your sound file
 }
 
 function setup() {
