@@ -48,8 +48,10 @@ class Firefly {
       }
     }
   }
-  
 
+let fireflies = [];
+let numFireflies = 100;
+let couplingStrength = 0.05;
 
 
 function preload() {
@@ -58,8 +60,18 @@ function preload() {
 
 function setup() {
 
+    createCanvas(500, 500);
+    for (let i = 0; i < numFireflies; i++){
+        let x = random(0, width);
+        let y = random(0, height);
+        fireflies.push(new Firefly(x,y));
+    }
+
 }
 
 function draw() {
+    backgroud(0);
+
+    
 
 }
