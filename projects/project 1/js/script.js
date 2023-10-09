@@ -2,9 +2,13 @@ class Firefly {
     constructor(x, y) {
       this.position = createVector(x, y);
       this.phase = random(TWO_PI);  // Start with a random phase between 0 and 2π
-      this.frequency = random(0.35, 0.55); // Random natural frequency, adjust range as needed
+      this.frequency = random(0.45, 0.55); // Random natural frequency, adjust range as needed
       this.neighbors = []; // Store recent phases of neighboring fireflies
       this.litDuration = 0;
+      this.velocity = createVector(0, 0);
+      this.acceleration = createVector(0, 0);
+      this.noiseOffsetX = random(0, 1000);  // For Perlin noise
+      this.noiseOffsetY = random(1000, 2000);  // For Perlin noise
     }
   
     // Display the firefly
@@ -16,7 +20,7 @@ class Firefly {
         fill(255); // Bright color for flash
         this.litDuration--;
       } else {
-        fill(10); // Dim color when not flashing
+        fill(25); // Dim color when not flashing
       }
       
       noStroke();
@@ -44,7 +48,24 @@ class Firefly {
             this.phase -= TWO_PI;
             this.litDuration = 10;  // Set duration for flashing
         }
-    }
+
+        // Movement using Perlin noise
+        this.acceleration.x = map(noise(this.noiseOffsetX), 0, 1, -0.05, 0.05);
+        this.acceleration.y = map(noise(this.noiseOffsetY), 0, 1, -0.05, 0.05);
+        this.velocity.add(this.acceleration);
+        this.velocity.limit(2);  // Limit speed
+        this.position.add(this.velocity);
+    
+        // Increment noise offsets for the next frame
+        this.noiseOffsetX += 0.01;
+        this.noiseOffsetY += 0.01;
+
+        // Boundary check to wrap fireflies around canvas
+        if (this.position.x > width) this.position.x = 0;
+        if (this.position.x < 0) this.position.x = width;
+        if (this.position.y > height) this.position.y = 0;
+        if (this.position.y < 0) this.position.y = height;
+        }
   }
 
 let fireflies = [];
