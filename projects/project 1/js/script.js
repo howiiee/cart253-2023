@@ -4,7 +4,7 @@ class Firefly {
       this.phase = random(TWO_PI);  // Start with a random phase between 0 and 2π
       this.frequency = random(0.45, 0.55); // Random natural frequency, adjust range as needed
       this.neighbors = []; // Store recent phases of neighboring fireflies
-      this.litDuration = 0;
+      this.brightness = 0;
       this.velocity = createVector(0, 0);
       this.acceleration = createVector(0, 0);
       this.noiseOffsetX = random(0, 1000);  // For Perlin noise
@@ -13,21 +13,15 @@ class Firefly {
   
     // Display the firefly
     display() {
-      push(); // Isolate the styles and transformations for this firefly
+    push(); // Isolate the styles and transformations for this firefly
   
-      // Check if the firefly should flash (e.g., when phase crosses 2π)
-      if (this.litDuration > 0) {
-        fill(255); // Bright color for flash
-        this.litDuration--;
-      } else {
-        fill(25); // Dim color when not flashing
-      }
-      
-      noStroke();
-      ellipse(this.position.x, this.position.y, 10, 10); // Display the firefly as a small circle
+    fill(this.brightness);  // Use the brightness for the fill
+    noStroke();
+    ellipse(this.position.x, this.position.y, 10, 10); // Display the firefly as a small circle
   
-      pop(); // Reset styles and transformations
-    }
+    pop(); // Reset styles and transformations
+}
+
   
     // Update the firefly's phase based on the Kuramoto model
     update(fireflies, couplingStrength) {
@@ -43,10 +37,14 @@ class Firefly {
         let deltaTime = 0.05;  // Small time step; adjust as necessary
         this.phase += (this.frequency + (couplingStrength / fireflies.length) * sumSinDifferences) * deltaTime;
     
-        // Check if the firefly should flash
+        // Check if the firefly should adjust brightness
         if (this.phase > TWO_PI) {
-            this.phase -= TWO_PI;
-            this.litDuration = 10;  // Set duration for flashing
+        this.phase -= TWO_PI;
+        this.brightness = 255;  // Set max brightness
+        } 
+        else {
+        // Gradually dim the firefly
+        this.brightness *= 0.95;  // Adjust this factor to control dimming speed
         }
 
         // Movement using Perlin noise
@@ -102,3 +100,19 @@ function draw() {
     }
 
 }
+
+function mousePressed() {
+    fireflies.push(new Firefly(mouseX, mouseY));
+}
+
+function mouseDragged() {
+    for (let firefly of fireflies) {
+        let distance = dist(mouseX, mouseY, firefly.position.x, firefly.position.y);
+        if (distance < 50) {
+            firefly.phase = random(TWO_PI);
+            firefly.brightness = 0;  // Reset brightness
+        }
+    }
+}
+
+
