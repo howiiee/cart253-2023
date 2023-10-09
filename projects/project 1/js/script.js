@@ -15,12 +15,15 @@ class Firefly {
     display() {
     push(); // Isolate the styles and transformations for this firefly
   
-    fill(this.brightness);  // Use the brightness for the fill
+    //let glowColor = color(237, 230, 165, this.brightness); // RGB with alpha based on brightness
+    fill(this.brightness);
+  
     noStroke();
     ellipse(this.position.x, this.position.y, 10, 10); // Display the firefly as a small circle
   
     pop(); // Reset styles and transformations
 }
+
 
   
     // Update the firefly's phase based on the Kuramoto model
@@ -68,7 +71,7 @@ class Firefly {
 
 let fireflies = [];
 let numFireflies = 100;
-let couplingStrength = 0.25;
+let couplingStrength = 0.1;
 
 
 function preload() {
