@@ -3,7 +3,6 @@ let firefly = {
     y: undefined,
     phase: undefined,
     freq: undefined
-    
 
 };
 
