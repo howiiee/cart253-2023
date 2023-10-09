@@ -2,8 +2,9 @@ class Firefly {
     constructor(x, y) {
       this.position = createVector(x, y);
       this.phase = random(TWO_PI);  // Start with a random phase between 0 and 2π
-      this.frequency = random(0.1, 1.0); // Random natural frequency, adjust range as needed
+      this.frequency = random(0.35, 0.55); // Random natural frequency, adjust range as needed
       this.neighbors = []; // Store recent phases of neighboring fireflies
+      this.litDuration = 0;
     }
   
     // Display the firefly
@@ -11,10 +12,11 @@ class Firefly {
       push(); // Isolate the styles and transformations for this firefly
   
       // Check if the firefly should flash (e.g., when phase crosses 2π)
-      if (this.phase > TWO_PI) {
+      if (this.litDuration > 0) {
         fill(255); // Bright color for flash
+        this.litDuration--;
       } else {
-        fill(150); // Dim color when not flashing
+        fill(10); // Dim color when not flashing
       }
       
       noStroke();
@@ -25,33 +27,29 @@ class Firefly {
   
     // Update the firefly's phase based on the Kuramoto model
     update(fireflies, couplingStrength) {
-      let sum = 0;
-      this.neighbors = []; // Clear neighbors
-  
-      // Calculate the sum of sin differences with other fireflies
-      for (let other of fireflies) {
-        if (other !== this) { // Avoid comparing with itself
-          let difference = other.phase - this.phase;
-          sum += sin(difference);
-          this.neighbors.push(other.phase); // Store the phase of the neighbor
+        // Kuramoto model equation
+        let sumSinDifferences = 0;
+        for (let other of fireflies) {
+            if (other !== this) {
+                let difference = other.phase - this.phase;
+                sumSinDifferences += sin(difference);
+            }
         }
-      }
-  
-      // Kuramoto model equation
-      let deltaPhase = this.frequency + (couplingStrength / this.neighbors.length) * sum;
-      
-      this.phase += deltaPhase; // Update the phase
-  
-      // Reset phase after it completes a cycle
-      if (this.phase > TWO_PI) {
-        this.phase -= TWO_PI;
-      }
+    
+        let deltaTime = 0.05;  // Small time step; adjust as necessary
+        this.phase += (this.frequency + (couplingStrength / fireflies.length) * sumSinDifferences) * deltaTime;
+    
+        // Check if the firefly should flash
+        if (this.phase > TWO_PI) {
+            this.phase -= TWO_PI;
+            this.litDuration = 10;  // Set duration for flashing
+        }
     }
   }
 
 let fireflies = [];
 let numFireflies = 100;
-let couplingStrength = 0.05;
+let couplingStrength = 0.25;
 
 
 function preload() {
@@ -67,11 +65,19 @@ function setup() {
         fireflies.push(new Firefly(x,y));
     }
 
+    // Adjusting the fireflies' frequency post-creation to narrow the frequency range
+    // for (let firefly of fireflies) {
+    //     firefly.frequency = random(0.45, 0.55);  // Narrowed frequency range
+    // }
+
 }
 
 function draw() {
-    backgroud(0);
+    background(0);
 
-    
+    for (let firefly of fireflies){
+        firefly.update(fireflies, couplingStrength);
+        firefly.display();
+    }
 
 }
