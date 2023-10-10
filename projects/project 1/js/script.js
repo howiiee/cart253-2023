@@ -13,16 +13,34 @@ class Firefly {
   
     // Display the firefly
     display() {
-    push(); // Isolate the styles and transformations for this firefly
-  
-    //let glowColor = color(237, 230, 165, this.brightness); // RGB with alpha based on brightness
-    fill(this.brightness);
-  
-    noStroke();
-    ellipse(this.position.x, this.position.y, 10, 10); // Display the firefly as a small circle
-  
-    pop(); // Reset styles and transformations
-}
+        push(); // Isolate the styles and transformations for this firefly
+        noStroke();  // Ensure no outlines for all parts of the firefly
+    
+        // Glow 2: Outermost glow
+        let outerGlowSize = 30;  // Increase overlap for a smoother blend
+        let outerGlowAlpha = this.brightness * 0.25; // Slight reduction in transparency
+        let outerGlowColor = color(237, 230, 165, outerGlowAlpha); 
+        fill(outerGlowColor);
+        ellipse(this.position.x, this.position.y, outerGlowSize, outerGlowSize);
+    
+        // Glow 1: Intermediate glow
+        let innerGlowSize = 22;  // Increase overlap for a smoother blend
+        let innerGlowAlpha = this.brightness * 0.5; // Stronger intermediate glow
+        let innerGlowColor = color(237, 230, 165, innerGlowAlpha); 
+        fill(innerGlowColor);
+        ellipse(this.position.x, this.position.y, innerGlowSize, innerGlowSize);
+    
+        // Core of the firefly
+        let coreSize = 14;  // Increase a bit for overlap
+        let coreColor = color(237, 230, 165, this.brightness); 
+        fill(coreColor);
+        ellipse(this.position.x, this.position.y, coreSize, coreSize);
+    
+        pop(); // Reset styles and transformations
+    }
+
+
+
 
 
   
@@ -121,15 +139,10 @@ function draw() {
     if (state === 0){
 
         textAlign(CENTER, CENTER);
-        fill(255);
+        fill(237, 230, 165, 25);
         textSize(fontSize);
         textFont(font);
         text("FIREFLIES", width/2, height/2);
-
-        for(let i = 0; i < fontPoints.length; i++){
-            ellipse(fontPoints[i].x, fontPoints[i].y, 10, 10);
-            console.log(fontPoints);
-        }
 
         for (let firefly of fireflies){
             firefly.update(fireflies, couplingStrength);
