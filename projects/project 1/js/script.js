@@ -84,50 +84,78 @@ let fireflies = [];
 let numFireflies = 100;
 let couplingStrength = 0.1;
 let tone;
-
+let state = 0;
+let points = [];
+let fontSize = 192;  // Adjust as needed
+let sampleFactor = 0.3;  // Adjust to increase/decrease point density
+let font;
 
 function preload() {
-    tone = loadSound("assets/sounds/chime.mp3"); 
+    tone = loadSound("assets/sounds/chime.mp3");
+    font = loadFont('assets/fonts/Arial Rounded Bold.ttf');  // Use any font you prefer
 }
 
-function setup() {
 
+function setup() {
     createCanvas(500, 500);
-    for (let i = 0; i < numFireflies; i++){
+    
+    // Get points from font
+    points = font.textToPoints('fireflies', 20, 250, fontSize, {
+        sampleFactor: sampleFactor
+    });
+    
+    // Create fireflies at these points
+    for (let pt of points) {
+        fireflies.push(new Firefly(pt.x, pt.y));
+    }
+
+    // If you have more fireflies than points, place the remaining fireflies randomly
+    while (fireflies.length < numFireflies) {
         let x = random(0, width);
         let y = random(0, height);
         fireflies.push(new Firefly(x,y));
     }
-
-    // Adjusting the fireflies' frequency post-creation to narrow the frequency range
-    // for (let firefly of fireflies) {
-    //     firefly.frequency = random(0.45, 0.55);  // Narrowed frequency range
-    // }
-
 }
 
 function draw() {
     background(0);
 
-    for (let firefly of fireflies){
-        firefly.update(fireflies, couplingStrength);
-        firefly.display();
+    if (state === 0){
+        // Just display the fireflies
+        for (let firefly of fireflies) {
+            firefly.display();
+        }
     }
-
+    else if (state === 1){
+        for (let firefly of fireflies){
+            firefly.update(fireflies, couplingStrength);
+            firefly.display();
+        }
+    }
 }
+
 
 function mousePressed() {
-    fireflies.push(new Firefly(mouseX, mouseY));
+    if (state === 0) {
+        state = 1;
+    } else if (state === 1) {
+        fireflies.push(new Firefly(mouseX, mouseY));  
+    }
 }
 
+
 function mouseDragged() {
-    for (let firefly of fireflies) {
+
+    if (state === 1){
+       for (let firefly of fireflies) {
         let distance = dist(mouseX, mouseY, firefly.position.x, firefly.position.y);
         if (distance < 50) {
             firefly.phase = random(TWO_PI);
             firefly.brightness = 0;  // Reset brightness
         }
+        } 
     }
+    
 }
 
 
