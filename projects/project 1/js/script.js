@@ -42,31 +42,33 @@ class Firefly {
     
         // Check if the firefly should adjust brightness
         if (this.phase > TWO_PI) {
-        this.phase -= TWO_PI;
-        this.brightness = 255;  // Set max brightness
-        } 
-        else {
-        // Gradually dim the firefly
-        this.brightness *= 0.95;  // Adjust this factor to control dimming speed
+            this.phase -= TWO_PI;
+            this.brightness = 255;  // Set max brightness
+        } else {
+            // Gradually dim the firefly
+            this.brightness *= 0.95;  // Adjust this factor to control dimming speed
         }
-
-        // Movement using Perlin noise
-        this.acceleration.x = map(noise(this.noiseOffsetX), 0, 1, -0.05, 0.05);
-        this.acceleration.y = map(noise(this.noiseOffsetY), 0, 1, -0.05, 0.05);
-        this.velocity.add(this.acceleration);
-        this.velocity.limit(2);  // Limit speed
-        this.position.add(this.velocity);
     
-        // Increment noise offsets for the next frame
-        this.noiseOffsetX += 0.01;
-        this.noiseOffsetY += 0.01;
-
-        // Boundary check to wrap fireflies around canvas
-        if (this.position.x > width) this.position.x = 0;
-        if (this.position.x < 0) this.position.x = width;
-        if (this.position.y > height) this.position.y = 0;
-        if (this.position.y < 0) this.position.y = height;
-
+        // Only move the fireflies if state is 1
+        if (state === 1) {
+            // Movement using Perlin noise
+            this.acceleration.x = map(noise(this.noiseOffsetX), 0, 1, -0.05, 0.05);
+            this.acceleration.y = map(noise(this.noiseOffsetY), 0, 1, -0.05, 0.05);
+            this.velocity.add(this.acceleration);
+            this.velocity.limit(2);  // Limit speed
+            this.position.add(this.velocity);
+    
+            // Increment noise offsets for the next frame
+            this.noiseOffsetX += 0.01;
+            this.noiseOffsetY += 0.01;
+    
+            // Boundary check to wrap fireflies around canvas
+            if (this.position.x > width) this.position.x = 0;
+            if (this.position.x < 0) this.position.x = width;
+            if (this.position.y > height) this.position.y = 0;
+            if (this.position.y < 0) this.position.y = height;
+        }
+    
         // Tone settings
         if (this.phase > TWO_PI) {
             this.phase -= TWO_PI;
@@ -75,28 +77,34 @@ class Firefly {
             }
             this.brightness = 255;  // Set max brightness
         }
-        }
-
-        
+    }
   }
 
 let fireflies = [];
-let numFireflies = 100;
+let numFireflies = 260;
 let couplingStrength = 0.1;
 let tone;
 let state = 0;
+let font;
+let fontPoints = [];
+let fontSize = 90;
 
 
 function preload() {
     tone = loadSound("assets/sounds/chime.mp3"); 
+    font = loadFont("assets/fonts/Arial.ttf")
 }
 
 function setup() {
 
     createCanvas(500, 500);
+
+    
+    fontPoints = font.textToPoints("FIREFLIES", 23, 288, fontSize);
+
     for (let i = 0; i < numFireflies; i++){
-        let x = random(0, width);
-        let y = random(0, height);
+        let x = fontPoints[i].x;
+        let y = fontPoints[i].y;
         fireflies.push(new Firefly(x,y));
     }
 
@@ -112,9 +120,22 @@ function draw() {
 
     if (state === 0){
 
-        fireflies[0].x = 5;
-        fireflies[0].y = 5;
-        fireflies[0].display();
+        textAlign(CENTER, CENTER);
+        fill(255);
+        textSize(fontSize);
+        textFont(font);
+        text("FIREFLIES", width/2, height/2);
+
+        for(let i = 0; i < fontPoints.length; i++){
+            ellipse(fontPoints[i].x, fontPoints[i].y, 10, 10);
+            console.log(fontPoints);
+        }
+
+        for (let firefly of fireflies){
+            firefly.update(fireflies, couplingStrength);
+            firefly.display();
+            }
+    
     }
 
     else if (state === 1){
