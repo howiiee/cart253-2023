@@ -92,7 +92,7 @@ let font;
 
 function preload() {
     tone = loadSound("assets/sounds/chime.mp3");
-    font = loadFont('assets/fonts/Arial Rounded Bold.ttf');  // Use any font you prefer
+    font = loadFont('assets/fonts/Arial Rounded Bold.ttf'); 
 }
 
 
