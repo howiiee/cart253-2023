@@ -87,7 +87,7 @@ let tone;
 
 
 function preload() {
-    tone = loadSound("/assets/sounds/chime sound effect.mp3"); 
+    tone = loadSound("assets/sounds/chime.mp3"); 
 }
 
 function setup() {
