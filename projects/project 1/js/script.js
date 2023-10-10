@@ -85,55 +85,47 @@ let numFireflies = 100;
 let couplingStrength = 0.1;
 let tone;
 let state = 0;
-let points = [];
-let fontSize = 192;  // Adjust as needed
-let sampleFactor = 0.3;  // Adjust to increase/decrease point density
-let font;
+
 
 function preload() {
-    tone = loadSound("assets/sounds/chime.mp3");
-    font = loadFont('assets/fonts/Arial Rounded Bold.ttf'); 
+    tone = loadSound("assets/sounds/chime.mp3"); 
 }
 
-
 function setup() {
-    createCanvas(500, 500);
-    
-    // Get points from font
-    points = font.textToPoints('fireflies', 20, 250, fontSize, {
-        sampleFactor: sampleFactor
-    });
-    
-    // Create fireflies at these points
-    for (let pt of points) {
-        fireflies.push(new Firefly(pt.x, pt.y));
-    }
 
-    // If you have more fireflies than points, place the remaining fireflies randomly
-    while (fireflies.length < numFireflies) {
+    createCanvas(500, 500);
+    for (let i = 0; i < numFireflies; i++){
         let x = random(0, width);
         let y = random(0, height);
         fireflies.push(new Firefly(x,y));
     }
+
+    // Adjusting the fireflies' frequency post-creation to narrow the frequency range
+    // for (let firefly of fireflies) {
+    //     firefly.frequency = random(0.45, 0.55);  // Narrowed frequency range
+    // }
+
 }
 
 function draw() {
     background(0);
 
     if (state === 0){
-        // Just display the fireflies
-        for (let firefly of fireflies) {
-            firefly.display();
-        }
+
+        fireflies[0].x = 5;
+        fireflies[0].y = 5;
+        fireflies[0].display();
     }
+
     else if (state === 1){
         for (let firefly of fireflies){
-            firefly.update(fireflies, couplingStrength);
-            firefly.display();
+        firefly.update(fireflies, couplingStrength);
+        firefly.display();
         }
     }
-}
+    
 
+}
 
 function mousePressed() {
     if (state === 0) {
@@ -157,5 +149,3 @@ function mouseDragged() {
     }
     
 }
-
-
