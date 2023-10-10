@@ -87,7 +87,7 @@ let tone;
 
 
 function preload() {
-    // tone = loadSound('path_to_your_tone.mp3'); // Replace with the path to your sound file
+    tone = loadSound("/assets/sounds/chime sound effect.mp3"); 
 }
 
 function setup() {
