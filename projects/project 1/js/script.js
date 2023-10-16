@@ -1,7 +1,7 @@
 class Firefly {
     constructor(x, y) {
       this.position = createVector(x, y);
-      this.phase = random(TWO_PI);  // Start with a random phase between 0 and 2π
+      this.phase = TWO_PI - 0.01;  // Start with a random phase between 0 and 2π
       this.frequency = random(0.45, 0.55); // Random natural frequency, adjust range as needed
       this.neighbors = []; // Store recent phases of neighboring fireflies
       this.brightness = 0;
@@ -39,11 +39,6 @@ class Firefly {
         pop(); // Reset styles and transformations
     }
 
-
-
-
-
-  
     // Update the firefly's phase based on the Kuramoto model
     update(fireflies, couplingStrength) {
         // Kuramoto model equation
@@ -61,14 +56,21 @@ class Firefly {
         // Check if the firefly should adjust brightness
         if (this.phase > TWO_PI) {
             this.phase -= TWO_PI;
-            this.brightness = 255;  // Set max brightness
+        
+            // Play sound first before updating brightness
+            if (state === 2 && this.brightness != 255) {
+                tone.play();
+            }
+        
+            this.brightness = 255;  // Set max brightness after checking
         } else {
             // Gradually dim the firefly
             this.brightness *= 0.95;  // Adjust this factor to control dimming speed
         }
+        
     
-        // Only move the fireflies if state is 1
-        if (state === 1) {
+        // Only move the fireflies if state is 2
+        if (state === 2) {
             // Movement using Perlin noise
             this.acceleration.x = map(noise(this.noiseOffsetX), 0, 1, -0.05, 0.05);
             this.acceleration.y = map(noise(this.noiseOffsetY), 0, 1, -0.05, 0.05);
@@ -87,99 +89,126 @@ class Firefly {
             if (this.position.y < 0) this.position.y = height;
         }
     
-        // Tone settings
-        if (this.phase > TWO_PI) {
-            this.phase -= TWO_PI;
-            if (this.brightness != 255) { // To prevent replaying the sound in consecutive frames
-                tone.play();
-            }
-            this.brightness = 255;  // Set max brightness
-        }
     }
   }
+
 
 let fireflies = [];
 let numFireflies = 260;
 let couplingStrength = 0.1;
 let tone;
-let state = 0;
+let state = 0; // Start with a black canvas state
 let font;
 let fontPoints = [];
-let fontSize = 90;
-
+let fontSize = 100;
 
 function preload() {
     tone = loadSound("assets/sounds/chime.mp3"); 
-    font = loadFont("assets/fonts/Arial.ttf")
+    font = loadFont("assets/fonts/AckiPreschool.ttf")
 }
 
 function setup() {
+    createCanvas(windowWidth, windowHeight);
+    fontPoints = font.textToPoints("f i R E f L I E S", 39, 450, fontSize);
 
-    createCanvas(500, 500);
-
+    let fontBounds = {
+        xMin: Infinity,
+        yMin: Infinity,
+        xMax: -Infinity,
+        yMax: -Infinity
+    };
     
-    fontPoints = font.textToPoints("FIREFLIES", 23, 288, fontSize);
-
-    for (let i = 0; i < numFireflies; i++){
-        let x = fontPoints[i].x;
-        let y = fontPoints[i].y;
-        fireflies.push(new Firefly(x,y));
+    for (let point of fontPoints) {
+        fontBounds.xMin = min(fontBounds.xMin, point.x);
+        fontBounds.yMin = min(fontBounds.yMin, point.y);
+        fontBounds.xMax = max(fontBounds.xMax, point.x);
+        fontBounds.yMax = max(fontBounds.yMax, point.y);
     }
+    
+    let fontWidth = fontBounds.xMax - fontBounds.xMin;
+    let fontHeight = fontBounds.yMax - fontBounds.yMin;
+    let xOffset = width / 2 - (fontBounds.xMin + fontWidth / 2);
+    let yOffset = height / 2 - (fontBounds.yMin + fontHeight / 2);
 
-    // Adjusting the fireflies' frequency post-creation to narrow the frequency range
-    // for (let firefly of fireflies) {
-    //     firefly.frequency = random(0.45, 0.55);  // Narrowed frequency range
-    // }
 
+    for (let i = 0; i < fontPoints.length; i++) {
+        let x = fontPoints[i].x + xOffset;
+        let y = fontPoints[i].y + yOffset;
+        let firefly = new Firefly(x, y);
+        fireflies.push(firefly);
+    }
+    
 }
 
 function draw() {
     background(0);
 
-    if (state === 0){
+    if (state === 0) {
+        textAlign(CENTER, CENTER);
+        fill(237, 230, 165);
+        textSize(30);  // Adjust font size so that text fits well
+        textFont(font);
 
+        // Split the text into lines
+        let lines = [
+            "Welcome to the Fireflies Simulation!",
+            "\n",
+            "This program creates a mesmerizing visual and auditory experience",
+            "that models the synchronized flashing patterns observed in",
+            "real-life fireflies.",
+            "\n",
+            "It is based on the Kuramoto model, which seeks to describe",
+            "the collective synchronization of coupled oscillators",
+            "\n",
+            "click to continue"
+        ];
+
+        // Display each line with a vertical offset
+        let lineSpacing = 50;
+        for (let i = 0; i < lines.length; i++) {
+            text(lines[i], width/2, (height/2) - (lineSpacing * (lines.length / 2)) + (i * lineSpacing));
+        }
+    }
+    else if (state === 1){
         textAlign(CENTER, CENTER);
         fill(237, 230, 165, 25);
         textSize(fontSize);
         textFont(font);
-        text("FIREFLIES", width/2, height/2);
+        //text("f i R E f L I E S", width/2, height/2);
 
         for (let firefly of fireflies){
             firefly.update(fireflies, couplingStrength);
             firefly.display();
-            }
-    
-    }
-
-    else if (state === 1){
+        }
+    } else if (state === 2) {
         for (let firefly of fireflies){
-        firefly.update(fireflies, couplingStrength);
-        firefly.display();
+            firefly.update(fireflies, couplingStrength);
+            firefly.display();
         }
     }
-    
-
 }
 
 function mousePressed() {
     if (state === 0) {
         state = 1;
     } else if (state === 1) {
-        fireflies.push(new Firefly(mouseX, mouseY));  
+        state = 2;
+        for (let firefly of fireflies) {
+            firefly.phase = random(TWO_PI);  // Randomize phase
+        }
+    } else if (state === 2) {
+        fireflies.push(new Firefly(mouseX, mouseY));
     }
 }
 
-
 function mouseDragged() {
-
-    if (state === 1){
+    if (state === 2){
        for (let firefly of fireflies) {
-        let distance = dist(mouseX, mouseY, firefly.position.x, firefly.position.y);
-        if (distance < 50) {
-            firefly.phase = random(TWO_PI);
-            firefly.brightness = 0;  // Reset brightness
-        }
+            let distance = dist(mouseX, mouseY, firefly.position.x, firefly.position.y);
+            if (distance < 50) {
+                firefly.phase = random(TWO_PI);
+                firefly.brightness = 0;  // Reset brightness
+            }
         } 
     }
-    
 }
