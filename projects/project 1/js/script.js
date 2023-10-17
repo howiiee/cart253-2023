@@ -259,3 +259,12 @@ function playTone(frequency, duration) {
         osc.stop();
     }, duration * 1000);
 }
+
+function windowResized() {
+    // Resize the canvas to new window dimensions
+    resizeCanvas(windowWidth, windowHeight);
+    
+    // (Optional) Re-position any UI elements or make adjustments based on the new size
+    couplingSlider.position(20, height - sliderGap);
+}
+
