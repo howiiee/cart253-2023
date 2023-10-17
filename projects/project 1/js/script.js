@@ -9,6 +9,7 @@ class Firefly {
       this.acceleration = createVector(0, 0);
       this.noiseOffsetX = random(0, 1000);  // For Perlin noise
       this.noiseOffsetY = random(1000, 2000);  // For Perlin noise
+      this.toneFrequency = random(pentatonicScale);
     }
   
     // Display the firefly
@@ -59,8 +60,9 @@ class Firefly {
         
             // Play sound first before updating brightness
             if (state === 2 && this.brightness != 255) {
-                tone.play();
+                playTone(this.toneFrequency, 0.2);  // Play the tone for 0.2 seconds
             }
+            
         
             this.brightness = 255;  // Set max brightness after checking
         } else {
@@ -101,6 +103,12 @@ let state = 0; // Start with a black canvas state
 let font;
 let fontPoints = [];
 let fontSize = 100;
+let pentatonicScale = [329.63, 392, 440, 493.88, 587.33];  // E4, G4, A4, B4, D5
+let couplingSlider;
+let sliderGap = 30; // Gap between slider and the bottom of the canvas
+let textGap = 20;   // Gap between text and the slider
+
+
 
 function preload() {
     tone = loadSound("assets/sounds/chime.mp3"); 
@@ -110,6 +118,10 @@ function preload() {
 function setup() {
     createCanvas(windowWidth, windowHeight);
     fontPoints = font.textToPoints("f i R E f L I E S", 39, 450, fontSize);
+
+    // Slider in stage 2
+    couplingSlider = createSlider(0, 1, 0.1, 0.01);
+    couplingSlider.hide(); 
 
     let fontBounds = {
         xMin: Infinity,
@@ -181,10 +193,29 @@ function draw() {
             firefly.display();
         }
     } else if (state === 2) {
+
+        couplingSlider.show();
+        couplingSlider.position(20, height - sliderGap);
+        couplingStrength = couplingSlider.value();
+        fill(237, 230, 165);
+        textSize(20);
+        textAlign(LEFT, BOTTOM);  // Change the alignment
+        let labelText = "Coupling Strength: " + couplingStrength.toFixed(2);
+        text(labelText, couplingSlider.x, couplingSlider.y);
+
+
         for (let firefly of fireflies){
             firefly.update(fireflies, couplingStrength);
             firefly.display();
         }
+
+        // Display instructions
+    textAlign(CENTER, BOTTOM);
+    fill(237, 230, 165); 
+    textSize(30);    
+    textFont(font);    
+    text("click to add a firefly", width/2, height - 50); // 50 pixels from the bottom
+    text("click and drag to reset fireflies lights", width/2, height - 10); // 20 pixels from the bottom
     }
 }
 
@@ -211,4 +242,20 @@ function mouseDragged() {
             }
         } 
     }
+}
+
+function playTone(frequency, duration) {
+    let osc = new p5.Oscillator();
+    osc.setType('sine');
+    osc.freq(frequency);
+    osc.amp(0.5, 0);  // Immediate ramp up to 0.5 amplitude
+    osc.start();
+    
+    setTimeout(() => {
+        osc.amp(0, 0.1);  // Ramp down to 0 amplitude over 0.1 seconds
+    }, duration * 1000 - 100);  // Subtract a little time to start the fade-out earlier
+    
+    setTimeout(() => {
+        osc.stop();
+    }, duration * 1000);
 }
