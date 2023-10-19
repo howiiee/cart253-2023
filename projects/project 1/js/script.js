@@ -216,6 +216,8 @@ function draw() {
     textFont(font);    
     text("click to add a firefly", width/2, height - 50); // 50 pixels from the bottom
     text("click and drag to reset fireflies lights", width/2, height - 10); // 20 pixels from the bottom
+    textAlign(CENTER, TOP);
+    text("be patient, the fireflies will sync", width/2, 10);
     }
 }
 
