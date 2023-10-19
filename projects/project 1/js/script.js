@@ -108,8 +108,6 @@ let couplingSlider;
 let sliderGap = 30; // Gap between slider and the bottom of the canvas
 let textGap = 20;   // Gap between text and the slider
 
-
-
 function preload() {
     tone = loadSound("assets/sounds/chime.mp3"); 
     font = loadFont("assets/fonts/AckiPreschool.ttf")
