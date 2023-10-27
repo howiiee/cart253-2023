@@ -122,7 +122,7 @@ function draw() {
         fill(0);
         textSize(32);
         textAlign(CENTER, CENTER);
-        text("Game Over!", width / 2, height / 2);
+        text("You ate! slay!", width / 2, height / 2);
         noLoop();
     }
 }
