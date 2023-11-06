@@ -13,8 +13,6 @@ function preload() {
     bgFlowerImage = loadImage("assets/images/flowers.gif");
 }
 
-
-
 function setup() {
     createCanvas(800, 600);
     gardener = new Gardener();
@@ -129,11 +127,12 @@ class RulesState {
         text("rules:", width / 2, height / 2 - 100);
         textSize(20);
         text("make all the flowers bloom, watch out for the pests!", width / 2, height / 2 - 60);
-        text("click the space bar to water the plants in gardener mode", width / 2, height / 2 - 30);
-        text("click the space bar to kill the pests in exterminator mode", width / 2, height / 2);
-        text("press the 'F' key to change between gardener mode and exterminator mode", width / 2, height / 2 + 30);
+        text("use the keypad to move the gardener", width / 2, height / 2 - 30);
+        text("click the space bar to water the plants in gardener mode", width / 2, height / 2);
+        text("click the space bar to kill the pests in exterminator mode", width / 2, height / 2 + 30);
+        text("press the 'F' key to change between gardener mode and exterminator mode", width / 2, height / 2 + 60);
         textSize(16);
-        text("[click to start the game]", width / 2, height / 2 + 80);
+        text("[click to start the game]", width / 2, height / 2 + 110);
     }
 
     mouseClicked() {
