@@ -3,14 +3,16 @@ let flowers = [];
 let pests = [];
 let gardener;
 const numFlowers = 10;
-const numPests = 3;
-let currentState;
 
 function preload() {
     for (let i = 0; i < 16; i++) {
         flowerImages[i] = loadImage("assets/images/flower" + nf(i, 2) + ".png");
     }
+    pestImage = loadImage("assets/images/pest.gif");
+    bgImage = loadImage("assets/images/bg.png");
+    bgFlowerImage = loadImage("assets/images/flowers.gif");
 }
+
 
 
 function setup() {
@@ -43,6 +45,30 @@ function mouseClicked() {
     currentState.mouseClicked();
 }
 
+function drawTiledBackground() {
+    let bgWidth = bgImage.width;
+    let bgHeight = bgImage.height;
+
+    // Creating tiled background
+    for (let x = 0; x <= width; x += bgWidth) {
+        for (let y = 0; y <= height; y += bgHeight) {
+            image(bgImage, x, y, bgWidth, bgHeight);
+        }
+    }
+}
+
+function drawTiledBackgroundFlowers() {
+    let bgFlowerImageWidth = bgFlowerImage.width;
+    let bgFlowerImageHeight = bgFlowerImage.height;
+
+    // Creating tiled background
+    for (let x = 0; x <= width; x += bgFlowerImageWidth) {
+        for (let y = 0; y <= height; y += bgFlowerImageHeight) {
+            image(bgFlowerImage, x, y, bgFlowerImageWidth, bgFlowerImageHeight);
+        }
+    }
+}
+
 function spawnPest() {
     // Set a maximum number of pests to avoid performance issues
     const maxPests = 25;
@@ -51,14 +77,16 @@ function spawnPest() {
         // If we've reached the maximum number of pests, don't spawn new ones
         return;
     }
-
+    if (!(currentState instanceof SimulationState)) {
+        return;
+    }
     if (pests.length < 1) {
         // Delay the first spawn by 5 seconds if there are no pests
         setTimeout(() => {
             if (pests.length < maxPests) { // Check again to avoid overshooting the max limit
                 pests.push(new Pest());
             }
-        }, 10000);
+        }, 5000);
     } else {
         // Immediately spawn a new pest for each existing one
         let newPests = [];
@@ -74,25 +102,48 @@ function spawnPest() {
 
 class TitleState {
     display() {
-        background(200);
+        drawTiledBackground();
+        drawTiledBackgroundFlowers();
         textSize(32);
         textAlign(CENTER);
         fill(0);
         text("Garden Simulation", width / 2, height / 2 - 40);
         textSize(16);
-        text("Click to start", width / 2, height / 2);
+        text("[click to start]", width / 2, height / 2);
     }
 
     mouseClicked() {
-        currentState = new SimulationState();
+        currentState = new RulesState();
     }
 
-    keyPressed() { }
+}
+
+class RulesState {
+    display() {
+        drawTiledBackground();
+        textSize(24);
+        textAlign(CENTER);
+        fill(252, 186, 3);
+
+        // Display the rules
+        text("rules:", width / 2, height / 2 - 100);
+        textSize(20);
+        text("make all the flowers bloom, watch out for the pests!", width / 2, height / 2 - 60);
+        text("click the space bar to water the plants in gardener mode", width / 2, height / 2 - 30);
+        text("click the space bar to kill the pests in exterminator mode", width / 2, height / 2);
+        text("press the 'F' key to change between gardener mode and exterminator mode", width / 2, height / 2 + 30);
+        textSize(16);
+        text("[click to start the game]", width / 2, height / 2 + 80);
+    }
+
+    mouseClicked() {
+        currentState = new SimulationState(); // Transition to the simulation state on click
+    }
 }
 
 class SimulationState {
     display() {
-        background(255);
+        drawTiledBackground();
         gardener.move();
         gardener.display();
 
@@ -126,7 +177,7 @@ class SimulationState {
         } else if (keyCode === 32) { // Spacebar
             if (gardener.mode === 'watering') {
                 flowers.forEach(flower => {
-                    if (dist(flower.x, flower.y, gardener.x, gardener.y) < 50) {
+                    if (dist(flower.x, flower.y, gardener.x, gardener.y) < flower.size) {
                         flower.water();
                     }
                 });
@@ -147,11 +198,11 @@ class SimulationState {
 
 class WinState {
     display() {
-        background(0, 255, 0);
+        drawTiledBackground();
         textSize(32);
         textAlign(CENTER);
-        fill(0);
-        text("Congratulations! All flowers have bloomed!", width / 2, height / 2);
+        fill(252, 186, 3);
+        text("congratulations! all flowers have bloomed!", width / 2, height / 2);
     }
 
     keyPressed() { }
@@ -164,7 +215,7 @@ class LoseState {
         textSize(32);
         textAlign(CENTER);
         fill(255);
-        text("Oh no! All flowers have been damaged!", width / 2, height / 2);
+        text("oh no! all flowers have been damaged!", width / 2, height / 2);
     }
 
     keyPressed() { }
@@ -177,6 +228,8 @@ class Flower {
         this.y = y;
         this.bloomState = 1;
         this.lastBloomUpdate = millis();
+        this.targetedByPests = 0;
+        this.size = 75;
     }
 
     water() {
@@ -195,7 +248,15 @@ class Flower {
 
 
     display() {
-        image(flowerImages[this.bloomState], this.x, this.y, 50, 50);
+        image(flowerImages[this.bloomState], this.x, this.y, this.size, this.size);
+    }
+
+    addPest() {
+        this.targetedByPests = min(this.targetedByPests + 1, 2); // Ensure the count doesn't exceed 2
+    }
+
+    removePest() {
+        this.targetedByPests = max(this.targetedByPests - 1, 0); // Ensure the count doesn't go below 0
     }
 }
 
@@ -244,64 +305,85 @@ class Pest {
     constructor(x = random(width), y = random(height)) {
         this.x = x;
         this.y = y;
-        this.speed = .5;
+        this.speed = 0.5;
         this.size = 20;
         this.attackEnabled = false;
-        this.targetFlower = null; // New property to keep track of the current target
+        this.targetFlower = null;
         this.lastAttackTime = 0;
-
-        // Set a timeout for enabling attacks to give the game some lead time
-        setTimeout(() => this.attackEnabled = true, 5000); // Enables attacks after 5 seconds
+        this.wanderTheta = random(TWO_PI); // Initialize a random direction for wandering
     }
 
-    // Function to select the closest flower that is not at bloomState 0
     selectTarget() {
         let closestFlower = null;
         let recordDistance = Infinity;
+
         flowers.forEach(flower => {
             let d = dist(this.x, this.y, flower.x, flower.y);
-            if (d < recordDistance && flower.bloomState > 0) {
+            if (d < recordDistance && flower.bloomState > 0 && flower.targetedByPests < 2) {
                 recordDistance = d;
                 closestFlower = flower;
             }
         });
+
+        if (this.targetFlower && this.targetFlower !== closestFlower) {
+            this.targetFlower.removePest();
+        }
+
         this.targetFlower = closestFlower;
+
+        if (this.targetFlower) {
+            this.targetFlower.addPest();
+        }
     }
 
-    move() {
-        // If there is no target or the current target is fully damaged, find a new one
-        if (!this.targetFlower || this.targetFlower.bloomState === 0) {
-            this.selectTarget();
-        }
+    wander() {
+        // Update wanderTheta to steer the pest in a new random direction
+        this.wanderTheta += random(-0.1, 0.1);
 
-        // Seek the target
-        if (this.targetFlower) {
-            let desired = createVector(this.targetFlower.x - this.x, this.targetFlower.y - this.y);
-            desired.setMag(this.speed);
-            this.x += desired.x;
-            this.y += desired.y;
-        }
+        // Apply the new direction to the pest's position
+        this.x += this.speed * cos(this.wanderTheta);
+        this.y += this.speed * sin(this.wanderTheta);
 
         // Keep the pest within the bounds of the canvas
         this.x = constrain(this.x, 0, width);
         this.y = constrain(this.y, 0, height);
     }
 
+    move() {
+        if (!this.targetFlower || this.targetFlower.bloomState === 0) {
+            this.selectTarget();
+        }
+    
+        if (this.targetFlower) {
+            // Calculate the bottom center of the target flower
+            let bottomCenterX = this.targetFlower.x + this.targetFlower.size / 2;
+            let bottomCenterY = this.targetFlower.y + this.targetFlower.size;
+    
+            // Create a vector that points from the pest's position to the bottom center of the flower
+            let desired = createVector(bottomCenterX - this.x, bottomCenterY - this.y);
+            desired.setMag(this.speed);
+            this.x += desired.x;
+            this.y += desired.y;
+        } else {
+            // If no target flower, wander around
+            this.wander();
+        }
+    }
+
     display() {
-        fill(150, 75, 0);
-        ellipse(this.x, this.y, this.size);
+        image(pestImage, this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
     }
 
     attack(flower) {
-        if (!this.attackEnabled) return;
-
-        if (flower === this.targetFlower && dist(this.x, this.y, flower.x, flower.y) < this.size / 2) {
+        // Check if the pest is near the bottom center of the flower
+        let bottomCenterX = flower.x + flower.size / 2;
+        let bottomCenterY = flower.y + flower.size;
+        if (flower === this.targetFlower && dist(this.x, this.y, bottomCenterX, bottomCenterY) < this.size / 2) {
             const currentTime = millis();
-            // Check if at least 1000 milliseconds (1 second) have passed
-            if (currentTime - this.lastAttackTime >= 1000) {
+            if (currentTime - this.lastAttackTime >= 750) {
                 flower.bloomState = max(flower.bloomState - 1, 0);
-                this.lastAttackTime = currentTime; // Reset the last attack time
-
+                this.lastAttackTime = currentTime;
+    
                 if (flower.bloomState === 0) {
                     this.selectTarget();
                 }
@@ -309,5 +391,6 @@ class Pest {
         }
     }
 }
+
 
 
