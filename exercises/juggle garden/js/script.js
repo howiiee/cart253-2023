@@ -19,11 +19,17 @@ function setup() {
     for (let i = 0; i < numFlowers; i++) {
         flowers.push(new Flower(random(50, width - 50), random(50, height - 50)));
     }
-    for (let i = 0; i < numPests; i++) {
-        pests.push(new Pest());
-    }
+
     currentState = new TitleState();
+
+    // Spawn the initial pest(s) after 5 seconds
+    pests.push(new Pest());
+    pests.push(new Pest());
+
+    // Call spawnPest every second
+    setInterval(spawnPest, 5000);
 }
+
 
 function draw() {
     currentState.display();
@@ -36,6 +42,35 @@ function keyPressed() {
 function mouseClicked() {
     currentState.mouseClicked();
 }
+
+function spawnPest() {
+    // Set a maximum number of pests to avoid performance issues
+    const maxPests = 25;
+
+    if (pests.length >= maxPests) {
+        // If we've reached the maximum number of pests, don't spawn new ones
+        return;
+    }
+
+    if (pests.length < 1) {
+        // Delay the first spawn by 5 seconds if there are no pests
+        setTimeout(() => {
+            if (pests.length < maxPests) { // Check again to avoid overshooting the max limit
+                pests.push(new Pest());
+            }
+        }, 10000);
+    } else {
+        // Immediately spawn a new pest for each existing one
+        let newPests = [];
+        pests.forEach(pest => {
+            if (pests.length + newPests.length < maxPests) { // Check to avoid overshooting the max limit
+                newPests.push(new Pest(pest.x, pest.y));
+            }
+        });
+        pests = pests.concat(newPests);
+    }
+}
+
 
 class TitleState {
     display() {
@@ -206,13 +241,14 @@ class Gardener {
 
 
 class Pest {
-    constructor() {
-        this.x = random(width);
-        this.y = random(height);
+    constructor(x = random(width), y = random(height)) {
+        this.x = x;
+        this.y = y;
         this.speed = .5;
         this.size = 20;
         this.attackEnabled = false;
         this.targetFlower = null; // New property to keep track of the current target
+        this.lastAttackTime = 0;
 
         // Set a timeout for enabling attacks to give the game some lead time
         setTimeout(() => this.attackEnabled = true, 5000); // Enables attacks after 5 seconds
@@ -257,11 +293,18 @@ class Pest {
     }
 
     attack(flower) {
-        if (this.attackEnabled && flower === this.targetFlower && dist(this.x, this.y, flower.x, flower.y) < this.size / 2) {
-            flower.bloomState = max(flower.bloomState - 1, 0);
-            // If the flower is fully damaged, select a new target
-            if (flower.bloomState === 0) {
-                this.selectTarget();
+        if (!this.attackEnabled) return;
+
+        if (flower === this.targetFlower && dist(this.x, this.y, flower.x, flower.y) < this.size / 2) {
+            const currentTime = millis();
+            // Check if at least 1000 milliseconds (1 second) have passed
+            if (currentTime - this.lastAttackTime >= 1000) {
+                flower.bloomState = max(flower.bloomState - 1, 0);
+                this.lastAttackTime = currentTime; // Reset the last attack time
+
+                if (flower.bloomState === 0) {
+                    this.selectTarget();
+                }
             }
         }
     }
