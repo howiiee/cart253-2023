@@ -63,10 +63,10 @@ function drawSpheres() {
     shader(myShader);
 
     // Sizes for each sphere, replace these with your own logic
-    let bassSphereSize = 50; // Size for the bass sphere
-    let midSphereSize = 50;  // Size for the mid sphere
-    let trebleSphereSize = 50; // Size for the treble sphere
-    let volumeSphereSize = 50; // Size for the volume sphere
+    let bassSphereSize = 75; // Size for the bass sphere
+    let midSphereSize = 75;  // Size for the mid sphere
+    let trebleSphereSize = 75; // Size for the treble sphere
+    let volumeSphereSize = 100; // Size for the volume sphere
 
     // Draw Bass Sphere
     myShader.setUniform('sphereType', 0);
