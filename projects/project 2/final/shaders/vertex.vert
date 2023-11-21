@@ -8,6 +8,7 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uModelViewMatrix;
 
 uniform float uTime;
+uniform float uFrameCount;
 uniform float uFreq;
 uniform float uAmp;
 uniform float uBass;
@@ -17,6 +18,8 @@ uniform float uVolume;
 uniform int sphereType; // Identifier for the sphere type
 
 varying vec3 vNormal;
+
+const float PI = 3.14159265359;
 
 vec3 mod289(vec3 x)
 {
@@ -183,7 +186,7 @@ float pnoise(vec3 P, vec3 rep)
 }
 
 void main() {
-    float displacement = pnoise(aNormal + uTime * 0.05, vec3(0.0)) - uFreq * 0.00005;
+    float displacement = pnoise(aNormal + uFrameCount * 0.05, vec3(0.0)) - uFreq * 0.00005;
 
     // Apply the displacement differently for each type of sphere
     if (sphereType == 0) {
@@ -192,7 +195,7 @@ void main() {
         displacement *= uMid;
     } else if (sphereType == 2) {
         displacement *= uTreble;
-    } else if (sphereType == 3){
+    } else if (sphereType == 3) {
         displacement *= uVolume;
     }
 
