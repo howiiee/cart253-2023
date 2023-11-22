@@ -4,6 +4,9 @@ let myShader;
 let gradientTexture;
 let bassAngle = 0.0, midAngle = 0.0, trebleAngle = 0.0, volumeAngle = 0.0;
 let jitter = 0.0;
+let bassPos, midPos, treblePos;
+let bassVel, midVel, trebleVel;
+let volumePos, volumeSphereSize = 100;
 
 function preload() {
     // Load an audio file
@@ -27,6 +30,16 @@ function setup() {
 
     shader(myShader);
     gradientTexture = createGradientTexture(['#F8C9DE', '#C0C9E6', '#F084B5','#E64297']);
+
+    // Initialize positions and velocities
+    bassPos = createVector(random(windowWidth), random(windowHeight));
+    midPos = createVector(random(windowWidth), random(windowHeight));
+    treblePos = createVector(random(windowWidth), random(windowHeight));
+    volumePos = createVector(windowWidth / 2, windowHeight / 2); // Centered
+
+    bassVel = p5.Vector.random2D();
+    midVel = p5.Vector.random2D();
+    trebleVel = p5.Vector.random2D();
 }
 
 function draw() {
@@ -40,7 +53,6 @@ function draw() {
     let mid = fft.getEnergy("mid");
     let treble = fft.getEnergy("treble");
     freq = fft.getCentroid();
-
     freq *= 0.001;
 
     // Update shader uniforms
@@ -53,6 +65,10 @@ function draw() {
     myShader.setUniform('uFreq', map(freq, 0, 1, 0, 20));
     myShader.setUniform('uGradient', gradientTexture);
 
+    // Update positions based on velocity
+    updateSpheres();
+
+    // Draw spheres at updated positions
     drawSpheres();
 }
 
@@ -66,65 +82,43 @@ function mousePressed() {
 }
 
 function drawSpheres() {
-    shader(myShader);
-
-    // Sizes for each sphere, replace these with your own logic
-    let bassSphereSize = 75; // Size for the bass sphere
-    let midSphereSize = 75;  // Size for the mid sphere
-    let trebleSphereSize = 75; // Size for the treble sphere
-    let volumeSphereSize = 100; // Size for the volume sphere
-
-    // Calculate jitter and update angles
-    if (second() % 2 == 0) {
-        jitter = random(0, 0.1);
-        jitter += jitter
-    }
-
-    // Use a time-based function like sin or cos for smoother rotation
-    let time = millis() / 1000; // Get the current time in seconds
-
-    // Update each angle using time
-    bassAngle = sin(time * 0.2) * TWO_PI;
-    midAngle = cos(time * 0.2) * TWO_PI;
-    trebleAngle = sin(time * 0.2 + PI / 2) * TWO_PI;
-    volumeAngle = cos(time * 0.02 + PI / 2) * TWO_PI;
-
+    // Assuming you have a function to set shader and draw a sphere, for example: drawSphere(pos, size, type)
+    
     // Draw Bass Sphere with rotation
-    myShader.setUniform('sphereType', 0);
+    myShader.setUniform('sphereType', 0); // Type for Bass
     push();
-    translate(-width / 4, 150, 0);
+    translate(bassPos.x - width / 2, bassPos.y - height / 2, 0); // Adjust for WEBGL coordinate system
     rotateX(bassAngle);
     rotateY(bassAngle);
-    sphere(bassSphereSize, 400, 400);
+    sphere(75, 400, 400); // Assuming the size is 75 for bass
     pop();
 
     // Draw Mid Sphere with rotation
-    myShader.setUniform('sphereType', 1);
+    myShader.setUniform('sphereType', 1); // Type for Mid
     push();
-    translate(width / 4, 150, 0);
+    translate(midPos.x - width / 2, midPos.y - height / 2, 0);
     rotateX(midAngle);
     rotateY(midAngle);
-    sphere(midSphereSize, 400, 400);
+    sphere(75, 400, 400); // Assuming the size is 75 for mid
     pop();
 
     // Draw Treble Sphere with rotation
-    myShader.setUniform('sphereType', 2);
+    myShader.setUniform('sphereType', 2); // Type for Treble
     push();
-    translate(0, -300, 0);
+    translate(treblePos.x - width / 2, treblePos.y - height / 2, 0);
     rotateX(trebleAngle);
     rotateY(trebleAngle);
-    sphere(trebleSphereSize, 400, 400);
+    sphere(75, 400, 400); // Assuming the size is 75 for treble
     pop();
 
-    // Draw Volume Sphere with rotation
-    myShader.setUniform('sphereType', 3);
+    // Draw Volume Sphere (Stationary)
+    myShader.setUniform('sphereType', 3); // Type for Volume
     push();
-    translate(0, 0, 0);
+    translate(volumePos.x - width / 2, volumePos.y - height / 2, 0);
     rotateX(volumeAngle);
     rotateY(volumeAngle);
-    sphere(volumeSphereSize, 400, 400);
+    sphere(volumeSphereSize, 400, 400); // Assuming the size for the volume sphere
     pop();
-
 }
 // Function to create gradient texture
 function createGradientTexture(colorArray) {
@@ -146,4 +140,36 @@ function lerpColorArray(colors, amt) {
     let i = int(amt * sections);
     let inter = (amt * sections) - i;
     return lerpColor(color(colors[i]), color(colors[i + 1]), inter);
+}
+
+function updateSpheres() {
+    bassPos.add(bassVel);
+    midPos.add(midVel);
+    treblePos.add(trebleVel);
+
+    // Collision detection and response
+    checkCollisions(bassPos, bassVel, 75); // assuming bass sphere size is 75
+    checkCollisions(midPos, midVel, 75);   // assuming mid sphere size is 75
+    checkCollisions(treblePos, trebleVel, 75); // assuming treble sphere size is 75
+}
+
+function checkCollisions(pos, vel, size) {
+    // Boundary collisions
+    if (pos.x < size / 2 || pos.x > windowWidth - size / 2) {
+        vel.x *= -1;
+    }
+    if (pos.y < size / 2 || pos.y > windowHeight - size / 2) {
+        vel.y *= -1;
+    }
+
+    // Collision with volume sphere
+    if (p5.Vector.dist(pos, volumePos) < size / 2 + volumeSphereSize / 2) {
+        // Simple collision response: reverse velocity
+        vel.mult(-1);
+    }
+
+    // Mouse interaction
+    if (p5.Vector.dist(pos, createVector(mouseX, mouseY)) < 100) {
+        vel.mult(-1);
+    }
 }
