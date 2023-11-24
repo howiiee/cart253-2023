@@ -16,6 +16,34 @@ let maxSpeedBass = 5;
 let maxSpeedMid = 5;
 let maxSpeedTreble = 5;
 
+window.onload = function () {
+  // Set the initial theme to Theme 1
+  changeTheme("theme1");
+
+  // Event listeners for theme buttons
+  document
+    .getElementById("theme1")
+    .addEventListener("click", () => changeTheme("theme1"));
+  document
+    .getElementById("theme2")
+    .addEventListener("click", () => changeTheme("theme2"));
+  document
+    .getElementById("theme3")
+    .addEventListener("click", () => changeTheme("theme3"));
+
+  // Event listener for song upload button
+  document
+    .getElementById("uploadButton")
+    .addEventListener("click", () =>
+      document.getElementById("songUpload").click()
+    );
+
+  // Event listener for file input
+  document
+    .getElementById("songUpload")
+    .addEventListener("change", (event) => uploadSong(event.target.files[0]));
+};
+
 function preload() {
   // Load an audio file
   audio = loadSound("assets/sounds/princess going digital.mp3");
@@ -56,7 +84,7 @@ function setup() {
 }
 
 function draw() {
-  background(200, 200, 234, 200);
+  background("#c8c8fa");
 
   // Analyze the frequency spectrum
   fft.analyze();
@@ -262,5 +290,96 @@ function fleeFromMouse(pos, vel, fleeDistance) {
 function constrainVelocity(velocity, maxSpeed) {
   if (velocity.mag() > maxSpeed) {
     velocity.setMag(maxSpeed);
+  }
+}
+
+function changeTheme(themeName) {
+  // Update the gradient texture and background color based on the theme
+  switch (themeName) {
+    case "theme1":
+      gradientTexture = createGradientTexture([
+        "#F8C9DE",
+        "#C0C9E6",
+        "#F084B5",
+        "#E64297",
+      ]);
+      document.body.style.backgroundColor = "#c8c8fa";
+      updateToolbarStyle("#F8C9DE", "#D06C8A");
+      break;
+    case "theme2":
+      gradientTexture = createGradientTexture([
+        "#6DDF6D",
+        "#73C2FB",
+        "#FFD700",
+        "#FF6347",
+      ]);
+      document.body.style.backgroundColor = "#f0d8d8";
+      updateToolbarStyle("#FF5733", "#D04623");
+      break;
+    case "theme3":
+      gradientTexture = createGradientTexture([
+        "#8A2BE2",
+        "#FF69B4",
+        "#00FFFF",
+        "#20B2AA",
+      ]);
+      document.body.style.backgroundColor = "#d8f8d8";
+      updateToolbarStyle("#00CED1", "#008B8B");
+      break;
+  }
+
+  // Highlight the active theme button
+  highlightActiveButton(themeName);
+}
+
+function resetThemeButtons() {
+  let themeButtons = ["theme1", "theme2", "theme3"];
+  themeButtons.forEach((buttonId) => {
+    document.getElementById(buttonId).style.backgroundColor = ""; // Reset to default color
+  });
+}
+
+function highlightActiveButton(activeThemeId) {
+  let themeButtons = ["theme1", "theme2", "theme3"];
+  themeButtons.forEach((buttonId) => {
+    let button = document.getElementById(buttonId);
+    if (buttonId === activeThemeId) {
+      // Set the background color to hover color for the active button
+      button.style.backgroundColor = button.onmouseover();
+      // Override the onmouseout function for the active button
+      button.onmouseout = function () {
+        this.style.backgroundColor = this.onmouseover(); // Keep the hover color even when the mouse is out
+      };
+    } else {
+      // Reset other buttons to default color
+      button.style.backgroundColor = ""; // Default color
+      // Reset onmouseout function to default behavior
+      button.onmouseout = function () {
+        this.style.backgroundColor = ""; // Default color
+      };
+    }
+  });
+}
+
+function updateToolbarStyle(buttonColor, hoverColor) {
+  let buttons = document.querySelectorAll("#toolbar button");
+  buttons.forEach((button) => {
+    button.style.backgroundColor = buttonColor;
+    button.onmouseover = function () {
+      this.style.backgroundColor = hoverColor;
+    };
+    button.onmouseout = function () {
+      this.style.backgroundColor = buttonColor;
+    };
+  });
+}
+
+// Function to upload a new song
+function uploadSong(file) {
+  if (file) {
+    // Implement your song upload logic here
+    console.log("Song uploaded:", file.name);
+    // Example: load new song into p5 sound
+    // audio = loadSound(file);
   }
 }
