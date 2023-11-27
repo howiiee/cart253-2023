@@ -384,10 +384,26 @@ function updateToolbarStyle(defaultColor, hoverColor) {
 
 // Function to upload a new song
 function uploadSong(file) {
+  // Clear the file input to allow re-uploading the same file
+  document.getElementById('songUpload').value = '';
+
   if (file) {
-    // Implement your song upload logic here
-    console.log("Song uploaded:", file.name);
-    // Example: load new song into p5 sound
-    // audio = loadSound(file);
+    // Check if the file extension is .mp3 or .wav
+    let fileExtension = file.name.split('.').pop().toLowerCase();
+    if (fileExtension === 'mp3' || fileExtension === 'wav') {
+      alert("Song uploaded: " + file.name);
+      // Load and play the song
+      audio = loadSound(file, () => {
+        alert("Song loaded and ready to play");
+        audio.play();
+      }, (e) => {
+        alert("Error loading the song: " + e);
+      });
+    } else {
+      alert("Invalid file type. Please upload an MP3 or WAV file.");
+    }
+  } else {
+    alert("No file selected. Please upload a file.");
   }
 }
+
