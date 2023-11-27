@@ -6,12 +6,10 @@ let bassAngle = 0.0,
   midAngle = 0.0,
   trebleAngle = 0.0,
   volumeAngle = 0.0;
-let jitter = 0.0;
 let bassPos, midPos, treblePos;
 let bassVel, midVel, trebleVel;
 let volumePos,
   volumeSphereSize = 100;
-
 let maxSpeedBass = 5;
 let maxSpeedMid = 5;
 let maxSpeedTreble = 5;
@@ -113,13 +111,33 @@ function draw() {
   drawSpheres();
 }
 
-// If you click the canvas, the audio will pause/play
 function mousePressed() {
-  if (audio.isPlaying()) {
-    audio.pause();
-  } else {
-    audio.loop();
+  // Check if the mouse is not over any of the buttons
+  if (!isMouseOverButton()) {
+    if (audio.isPlaying()) {
+      audio.pause();
+    } else {
+      audio.loop();
+    }
   }
+}
+
+// Helper function to determine if the mouse is over any button
+function isMouseOverButton() {
+  let buttons = document.querySelectorAll("button");
+  for (let i = 0; i < buttons.length; i++) {
+    let button = buttons[i];
+    let boundingBox = button.getBoundingClientRect();
+    if (
+      mouseX > boundingBox.left &&
+      mouseX < boundingBox.right &&
+      mouseY > boundingBox.top &&
+      mouseY < boundingBox.bottom
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function drawSpheres() {
@@ -334,13 +352,6 @@ function changeTheme(themeName) {
 
   // Highlight the active theme button
   highlightActiveButton(themeName, themes);
-}
-
-function resetThemeButtons() {
-  let themeButtons = ["theme1", "theme2", "theme3"];
-  themeButtons.forEach((buttonId) => {
-    document.getElementById(buttonId).style.backgroundColor = ""; // Reset to default color
-  });
 }
 
 function highlightActiveButton(activeThemeId, themes) {
