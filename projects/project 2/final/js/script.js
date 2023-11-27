@@ -294,6 +294,13 @@ function constrainVelocity(velocity, maxSpeed) {
 }
 
 function changeTheme(themeName) {
+  // Define colors for each theme
+  const themes = {
+    theme1: { default: "#F8C9DE", hover: "#D06C8A", background: "#c8c8fa" },
+    theme2: { default: "#FF5733", hover: "#D04623", background: "#f0d8d8" },
+    theme3: { default: "#00CED1", hover: "#008B8B", background: "#d8f8d8" },
+  };
+
   // Update the gradient texture and background color based on the theme
   switch (themeName) {
     case "theme1":
@@ -303,8 +310,6 @@ function changeTheme(themeName) {
         "#F084B5",
         "#E64297",
       ]);
-      document.body.style.backgroundColor = "#c8c8fa";
-      updateToolbarStyle("#F8C9DE", "#D06C8A");
       break;
     case "theme2":
       gradientTexture = createGradientTexture([
@@ -313,8 +318,6 @@ function changeTheme(themeName) {
         "#FFD700",
         "#FF6347",
       ]);
-      document.body.style.backgroundColor = "#f0d8d8";
-      updateToolbarStyle("#FF5733", "#D04623");
       break;
     case "theme3":
       gradientTexture = createGradientTexture([
@@ -323,13 +326,14 @@ function changeTheme(themeName) {
         "#00FFFF",
         "#20B2AA",
       ]);
-      document.body.style.backgroundColor = "#d8f8d8";
-      updateToolbarStyle("#00CED1", "#008B8B");
       break;
   }
 
+  // Update the document's background color
+  document.body.style.backgroundColor = themes[themeName].background;
+
   // Highlight the active theme button
-  highlightActiveButton(themeName);
+  highlightActiveButton(themeName, themes);
 }
 
 function resetThemeButtons() {
@@ -339,37 +343,41 @@ function resetThemeButtons() {
   });
 }
 
-function highlightActiveButton(activeThemeId) {
-  let themeButtons = ["theme1", "theme2", "theme3"];
+function highlightActiveButton(activeThemeId, themes) {
+  let themeButtons = ["theme1", "theme2", "theme3", "uploadButton"];
+
   themeButtons.forEach((buttonId) => {
     let button = document.getElementById(buttonId);
-    if (buttonId === activeThemeId) {
-      // Set the background color to hover color for the active button
-      button.style.backgroundColor = button.onmouseover();
-      // Override the onmouseout function for the active button
-      button.onmouseout = function () {
-        this.style.backgroundColor = this.onmouseover(); // Keep the hover color even when the mouse is out
-      };
-    } else {
-      // Reset other buttons to default color
-      button.style.backgroundColor = ""; // Default color
-      // Reset onmouseout function to default behavior
-      button.onmouseout = function () {
-        this.style.backgroundColor = ""; // Default color
-      };
-    }
+    // Set all buttons to the default color of the active theme
+    button.style.backgroundColor = themes[activeThemeId].default;
+
+    // Set hover behavior for all buttons
+    button.onmouseover = function () {
+      this.style.backgroundColor = themes[activeThemeId].hover;
+    };
+    button.onmouseout = function () {
+      this.style.backgroundColor = themes[activeThemeId].default;
+    };
   });
+
+  // Set the active theme button to its own hover color and remove hover effects
+  let activeButton = document.getElementById(activeThemeId);
+  if (activeButton) {
+    activeButton.style.backgroundColor = themes[activeThemeId].hover;
+    activeButton.onmouseover = null;
+    activeButton.onmouseout = null;
+  }
 }
 
-function updateToolbarStyle(buttonColor, hoverColor) {
+function updateToolbarStyle(defaultColor, hoverColor) {
   let buttons = document.querySelectorAll("#toolbar button");
   buttons.forEach((button) => {
-    button.style.backgroundColor = buttonColor;
+    button.style.backgroundColor = defaultColor;
     button.onmouseover = function () {
       this.style.backgroundColor = hoverColor;
     };
     button.onmouseout = function () {
-      this.style.backgroundColor = buttonColor;
+      this.style.backgroundColor = defaultColor;
     };
   });
 }

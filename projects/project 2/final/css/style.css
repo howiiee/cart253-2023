@@ -6,6 +6,7 @@ body {
   align-content: center;
   height: 100vh; /* Body is the height of the viewport */
   overflow: hidden; /* Hide anything that goes off the window size */
+  background-color: #c8c8fa; /* You can set your preferred background color */
 }
 
 #toolbar {
@@ -13,15 +14,16 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: #f8f8f8; /* Light grey background */
+  background-color: transparent; /* Make the toolbar background transparent */
   padding: 10px;
   text-align: center;
+  border: none; /* Remove any border */
 }
 
 #toolbar button {
   padding: 10px 20px;
   margin: 0 5px;
-  background-color: #F8C9DE; /* Green background */
+  background-color: #F8C9DE;
   color: white;
   border: none;
   border-radius: 5px;
@@ -31,4 +33,3 @@ body {
 #toolbar button:hover {
   background-color: #E64297;
 }
-
