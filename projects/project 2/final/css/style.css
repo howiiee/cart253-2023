@@ -23,7 +23,7 @@ body {
 #toolbar button {
   padding: 10px 20px;
   margin: 0 5px;
-  background-color: #F8C9DE;
+  background-color: #f8c9de;
   color: white;
   border: none;
   border-radius: 5px;
@@ -31,5 +31,5 @@ body {
 }
 
 #toolbar button:hover {
-  background-color: #E64297;
+  background-color: #e64297;
 }

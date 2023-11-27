@@ -385,20 +385,24 @@ function updateToolbarStyle(defaultColor, hoverColor) {
 // Function to upload a new song
 function uploadSong(file) {
   // Clear the file input to allow re-uploading the same file
-  document.getElementById('songUpload').value = '';
+  document.getElementById("songUpload").value = "";
 
   if (file) {
     // Check if the file extension is .mp3 or .wav
-    let fileExtension = file.name.split('.').pop().toLowerCase();
-    if (fileExtension === 'mp3' || fileExtension === 'wav') {
+    let fileExtension = file.name.split(".").pop().toLowerCase();
+    if (fileExtension === "mp3" || fileExtension === "wav") {
       alert("Song uploaded: " + file.name);
       // Load and play the song
-      audio = loadSound(file, () => {
-        alert("Song loaded and ready to play");
-        audio.play();
-      }, (e) => {
-        alert("Error loading the song: " + e);
-      });
+      audio = loadSound(
+        file,
+        () => {
+          alert("Song loaded and ready to play");
+          audio.play();
+        },
+        (e) => {
+          alert("Error loading the song: " + e);
+        }
+      );
     } else {
       alert("Invalid file type. Please upload an MP3 or WAV file.");
     }
@@ -406,4 +410,3 @@ function uploadSong(file) {
     alert("No file selected. Please upload a file.");
   }
 }
-
