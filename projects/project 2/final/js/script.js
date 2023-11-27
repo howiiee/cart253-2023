@@ -10,6 +10,7 @@ let bassPos, midPos, treblePos;
 let bassVel, midVel, trebleVel;
 let volumePos,
   volumeSphereSize = 100;
+
 let maxSpeedBass = 5;
 let maxSpeedMid = 5;
 let maxSpeedTreble = 5;
@@ -30,17 +31,22 @@ window.onload = function () {
     .addEventListener("click", () => changeTheme("theme3"));
 
   // Event listener for song upload button
-  document
-    .getElementById("uploadButton")
-    .addEventListener("click", () =>
-      document.getElementById("songUpload").click()
-    );
+  document.getElementById("uploadButton").addEventListener("click", () => {
+    // Check if the audio is playing, if so, pause it
+    if (audio.isPlaying()) {
+      audio.pause();
+    }
+    
+    // Trigger the file upload input
+    document.getElementById("songUpload").click();
+  });
 
   // Event listener for file input
   document
     .getElementById("songUpload")
     .addEventListener("change", (event) => uploadSong(event.target.files[0]));
 };
+
 
 function preload() {
   // Load an audio file
