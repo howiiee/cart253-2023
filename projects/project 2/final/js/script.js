@@ -45,6 +45,15 @@ window.onload = function () {
   document
     .getElementById("songUpload")
     .addEventListener("change", (event) => uploadSong(event.target.files[0]));
+
+    // Assuming your GIF duration is 3 seconds
+    setTimeout(() => {
+      document.getElementById('loadingScreen').style.opacity = '0';
+      // Wait for the fade-out transition to finish before setting display to none
+      setTimeout(() => {
+          document.getElementById('loadingScreen').style.display = 'none';
+      }, 500); // This should match the CSS transition duration
+  }, 3400); // Set this to the duration of your GIF
 };
 
 
@@ -408,15 +417,38 @@ function uploadSong(file) {
     // Check if the file extension is .mp3 or .wav
     let fileExtension = file.name.split(".").pop().toLowerCase();
     if (fileExtension === "mp3" || fileExtension === "wav") {
-      alert("Song uploaded: " + file.name);
+      // Show loading screen
+      document.getElementById('loadingScreen').style.display = 'flex';
+      document.getElementById('loadingScreen').style.opacity = '1';
+
+      // Reload the GIF to start from the beginning
+      let loadingGif = document.getElementById('loadingGif');
+      let gifSrc = loadingGif.src;
+      loadingGif.src = ''; // Reset the source
+      loadingGif.src = gifSrc; // Set it back to restart the GIF
+
       // Load and play the song
       audio = loadSound(
         file,
         () => {
-          alert("Song loaded and ready to play");
+          // Wait for 3 seconds before starting the fade-out transition
+          setTimeout(() => {
+            document.getElementById('loadingScreen').style.opacity = '0';
+            // Wait for the fade-out transition to finish before setting display to none
+            setTimeout(() => {
+              document.getElementById('loadingScreen').style.display = 'none';
+            }, 500); // This should match the CSS transition duration
+          }, 3400);
+
           audio.play();
         },
         (e) => {
+          // Hide loading screen if there's an error
+          document.getElementById('loadingScreen').style.opacity = '0';
+          setTimeout(() => {
+            document.getElementById('loadingScreen').style.display = 'none';
+          }, 3400); // This timeout duration should match your CSS transition
+
           alert("Error loading the song: " + e);
         }
       );
@@ -427,3 +459,6 @@ function uploadSong(file) {
     alert("No file selected. Please upload a file.");
   }
 }
+
+
+
