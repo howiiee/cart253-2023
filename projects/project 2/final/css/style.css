@@ -1,12 +1,12 @@
 body {
   padding: 0;
   margin: 0;
-  display: grid; /* Set up the grid and justify/align to center */
+  display: grid; 
   justify-content: center;
   align-content: center;
-  height: 100vh; /* Body is the height of the viewport */
-  overflow: hidden; /* Hide anything that goes off the window size */
-  background-color: #c8c8fa; /* You can set your preferred background color */
+  height: 100vh; 
+  overflow: hidden; 
+  background-color: #c8c8fa;
 }
 
 #toolbar {
@@ -36,7 +36,7 @@ body {
 
 #loadingScreen {
   transition: opacity 0.5s ease-out;
-  position: fixed; /* or absolute */
+  position: fixed; 
   top: 0;
   left: 0;
   width: 100%;
@@ -45,9 +45,8 @@ body {
 }
 
 #loadingScreen img {
-  width: 200px;  /* Set your desired width */
-  height: auto;  /* Maintain the aspect ratio */
-  /* or set a specific height: height: 100px; */
+  width: 200px;  
+  height: auto;  
 }
 
 

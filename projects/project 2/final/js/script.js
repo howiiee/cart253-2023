@@ -46,14 +46,13 @@ window.onload = function () {
     .getElementById("songUpload")
     .addEventListener("change", (event) => uploadSong(event.target.files[0]));
 
-    // Assuming your GIF duration is 3 seconds
     setTimeout(() => {
       document.getElementById('loadingScreen').style.opacity = '0';
       // Wait for the fade-out transition to finish before setting display to none
       setTimeout(() => {
           document.getElementById('loadingScreen').style.display = 'none';
-      }, 500); // This should match the CSS transition duration
-  }, 3400); // Set this to the duration of your GIF
+      }, 500); 
+  }, 3400);
 };
 
 
@@ -156,15 +155,14 @@ function isMouseOverButton() {
 }
 
 function drawSpheres() {
-  // Assuming you have a function to set shader and draw a sphere, for example: drawSphere(pos, size, type)
-
+  
   // Draw Bass Sphere with rotation
   myShader.setUniform("sphereType", 0); // Type for Bass
   push();
   translate(bassPos.x - width / 2, bassPos.y - height / 2, 0); // Adjust for WEBGL coordinate system
   rotateX(bassAngle);
   rotateY(bassAngle);
-  sphere(75, 400, 400); // Assuming the size is 75 for bass
+  sphere(75, 400, 400); 
   pop();
 
   // Draw Mid Sphere with rotation
@@ -173,7 +171,7 @@ function drawSpheres() {
   translate(midPos.x - width / 2, midPos.y - height / 2, 0);
   rotateX(midAngle);
   rotateY(midAngle);
-  sphere(75, 400, 400); // Assuming the size is 75 for mid
+  sphere(75, 400, 400); 
   pop();
 
   // Draw Treble Sphere with rotation
@@ -182,7 +180,7 @@ function drawSpheres() {
   translate(treblePos.x - width / 2, treblePos.y - height / 2, 0);
   rotateX(trebleAngle);
   rotateY(trebleAngle);
-  sphere(75, 400, 400); // Assuming the size is 75 for treble
+  sphere(75, 400, 400); 
   pop();
 
   // Draw Volume Sphere (Stationary)
@@ -191,7 +189,7 @@ function drawSpheres() {
   translate(volumePos.x - width / 2, volumePos.y - height / 2, 0);
   rotateX(volumeAngle);
   rotateY(volumeAngle);
-  sphere(volumeSphereSize, 400, 400); // Assuming the size for the volume sphere
+  sphere(volumeSphereSize, 400, 400);
   pop();
 }
 // Function to create gradient texture
@@ -200,7 +198,7 @@ function createGradientTexture(colorArray) {
   gradTexture.noStroke();
   for (let i = 0; i < gradTexture.width; i++) {
     let inter = map(i, 0, gradTexture.width, 0, 1);
-    let c = lerpColorArray(colorArray, inter); // Use your existing function
+    let c = lerpColorArray(colorArray, inter); 
     gradTexture.stroke(c);
     gradTexture.line(i, 0, i, gradTexture.height);
   }
@@ -233,9 +231,9 @@ function updateSpheres() {
   fleeFromMouse(treblePos, trebleVel, 150); // flee if mouse is within 150 pixels of the treble sphere
 
   // Collision detection and response
-  checkCollisions(bassPos, bassVel, 75); // assuming bass sphere size is 75
-  checkCollisions(midPos, midVel, 75); // assuming mid sphere size is 75
-  checkCollisions(treblePos, trebleVel, 75); // assuming treble sphere size is 75
+  checkCollisions(bassPos, bassVel, 75); 
+  checkCollisions(midPos, midVel, 75); 
+  checkCollisions(treblePos, trebleVel, 75); 
 
   constrainVelocity(bassVel, maxSpeedBass);
   constrainVelocity(midVel, maxSpeedMid);
@@ -243,7 +241,7 @@ function updateSpheres() {
 }
 
 function wander(vel) {
-  let angleChange = 0.1; // Adjust this value for more or less wandering
+  let angleChange = 0.1; 
   let angle = vel.heading() + random(-angleChange, angleChange);
   let speed = vel.mag();
   vel.x = cos(angle) * speed;
@@ -437,7 +435,7 @@ function uploadSong(file) {
             // Wait for the fade-out transition to finish before setting display to none
             setTimeout(() => {
               document.getElementById('loadingScreen').style.display = 'none';
-            }, 500); // This should match the CSS transition duration
+            }, 500); //
           }, 3400);
 
           audio.play();
@@ -447,7 +445,7 @@ function uploadSong(file) {
           document.getElementById('loadingScreen').style.opacity = '0';
           setTimeout(() => {
             document.getElementById('loadingScreen').style.display = 'none';
-          }, 3400); // This timeout duration should match your CSS transition
+          }, 3400); 
 
           alert("Error loading the song: " + e);
         }
